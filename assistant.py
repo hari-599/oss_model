@@ -5,7 +5,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 class ChatAssistant:
     def __init__(self):
         self.model_name = "Qwen/Qwen2.5-1.5B-Instruct"
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_name, torch_dtype="auto", device_map="auto")
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        dtype = torch.float16 if self.device == "cuda" else torch.float32
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_name,
+            torch_dtype=dtype,
+            low_cpu_mem_usage=True,
+        ).to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.history = []
         self.system_prompt = (
@@ -21,18 +27,18 @@ class ChatAssistant:
         for turn in self.history:
             messages.append({"role": "user", "content": turn["user"]})
             messages.append({"role": "assistant", "content": turn["assistant"]})
-            messages.append({"role": "user", "content": user_message})
+        messages.append({"role": "user", "content": user_message})
         return messages
 
     def generate_response(self, user_message: str) -> str:
         prompt = self.build_message(user_message)
         text=self.tokenizer.apply_chat_template(prompt,tokenize=False,add_generation_prompt=True)
-        inputs = self.tokenizer(text, return_tensors="pt").to(self.model.device)
+        inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
 
         with torch.no_grad():
             output = self.model.generate(
                 **inputs,
-                max_new_tokens=256,
+                max_new_tokens=160,
                 temperature=0.7,
                 top_p=0.75,
                 do_sample=True,
