@@ -19,9 +19,8 @@ class ChatAssistant:
             "Maintain conversational context and avoid harmful responses."
         )
 
-
-    def build_message(self, user_message: str) -> str:
-        messages=[
+    def build_message(self, user_message: str) -> list[dict[str, str]]:
+        messages = [
             {"role": "system", "content": self.system_prompt},
         ]
         for turn in self.history:
@@ -32,7 +31,11 @@ class ChatAssistant:
 
     def generate_response(self, user_message: str) -> str:
         prompt = self.build_message(user_message)
-        text=self.tokenizer.apply_chat_template(prompt,tokenize=False,add_generation_prompt=True)
+        text = self.tokenizer.apply_chat_template(
+            prompt,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
 
         with torch.no_grad():
@@ -48,6 +51,9 @@ class ChatAssistant:
             )
 
         generated_tokens = output[0][inputs["input_ids"].shape[1]:]
-        response = self.tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+        response = self.tokenizer.decode(
+            generated_tokens,
+            skip_special_tokens=True,
+        ).strip()
         self.history.append({"user": user_message, "assistant": response})
         return response
