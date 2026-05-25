@@ -1,0 +1,2 @@
+{"trace_id": "f5b336cc-edae-4fde-84db-e8f2acbb86e0", "event": "model_response", "latency_ms": 12315, "provider": "gemini", "model": "gemini-2.5-flash", "message_count": 2, "blocked": false}
+{"trace_id": "3f33fa64-0149-4058-ae55-8173d22bc718", "event": "model_response", "latency_ms": 2564, "provider": "gemini", "model": "gemini-2.5-flash", "message_count": 4, "blocked": false}
