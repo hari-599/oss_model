@@ -1,13 +1,3 @@
----
-title: Luna OSS Chat Assistant
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 7860
-pinned: false
-license: mit
----
- 
 # Luna OSS Chat Assistant
 
 > A small project that compares two personal chat assistant deployments.
